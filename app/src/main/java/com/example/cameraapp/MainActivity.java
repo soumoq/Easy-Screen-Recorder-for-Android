@@ -49,9 +49,15 @@ public class MainActivity extends AppCompatActivity {
         Rational aspectRatio = new Rational (textureView.getWidth(), textureView.getHeight());
         Size screen = new Size(textureView.getWidth(), textureView.getHeight()); //size of the screen
 
-
-        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(CameraX.LensFacing.BACK).build();
+        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(CameraX.LensFacing.FRONT).build();
         Preview preview = new Preview(pConfig);
+
+        try {
+            CameraX.getCameraWithLensFacing(CameraX.LensFacing.FRONT);
+        }catch (Exception e)
+        {
+            Toast.makeText(this,"Exception: "+e,Toast.LENGTH_LONG).show();
+        }
 
         preview.setOnPreviewOutputUpdateListener(
                 new Preview.OnPreviewOutputUpdateListener() {
@@ -69,35 +75,9 @@ public class MainActivity extends AppCompatActivity {
                 });
 
 
-        ImageCaptureConfig imageCaptureConfig = new ImageCaptureConfig.Builder().setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
-                .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation()).build();
-        final ImageCapture imgCap = new ImageCapture(imageCaptureConfig);
-
-        findViewById(R.id.imgCapture).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                File file = new File(Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis() + ".png");
-                imgCap.takePicture(file, new ImageCapture.OnImageSavedListener() {
-                    @Override
-                    public void onImageSaved(@NonNull File file) {
-                        String msg = "Pic captured at " + file.getAbsolutePath();
-                        Toast.makeText(getBaseContext(), msg,Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onError(@NonNull ImageCapture.UseCaseError useCaseError, @NonNull String message, @Nullable Throwable cause) {
-                        String msg = "Pic capture failed : " + message;
-                        Toast.makeText(getBaseContext(), msg,Toast.LENGTH_LONG).show();
-                        if(cause != null){
-                            cause.printStackTrace();
-                        }
-                    }
-                });
-            }
-        });
 
         //bind to lifecycle:
-        CameraX.bindToLifecycle((LifecycleOwner)this, preview, imgCap);
+        CameraX.bindToLifecycle((LifecycleOwner)this, preview);
     }
 
     private void updateTransform(){
@@ -132,28 +112,6 @@ public class MainActivity extends AppCompatActivity {
         textureView.setTransform(mx);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        if(requestCode == REQUEST_CODE_PERMISSIONS){
-            if(allPermissionsGranted()){
-                startCamera();
-            } else{
-                Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
-    }
-
-    /*private boolean allPermissionsGranted(){
-
-        for(String permission : REQUIRED_PERMISSIONS){
-            if(ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
-                return false;
-            }
-        }
-        return true;
-    }*/
     private boolean allPermissionsGranted()
     {
         return true;
