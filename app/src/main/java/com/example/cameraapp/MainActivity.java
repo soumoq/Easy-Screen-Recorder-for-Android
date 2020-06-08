@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -24,6 +25,7 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int MY_PERMISSIONS_CAMERA=1;
     private int REQUEST_CODE_PERMISSIONS = 101;
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
     TextureView textureView;
@@ -114,6 +116,22 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean allPermissionsGranted()
     {
+        //When permission is not granted by user, show them message why this permission is needed.
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.CAMERA)) {
+            Toast.makeText(this, "Please grant permissions to camera", Toast.LENGTH_LONG).show();
+
+            //Give user option to still opt-in the permissions
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    MY_PERMISSIONS_CAMERA);
+        } else {
+            // Show user dialog to grant permission to record audio
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    MY_PERMISSIONS_CAMERA);
+        }
+
         return true;
     }
 }
