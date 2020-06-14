@@ -6,16 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextureView
-        android:id="@+id/view_finder"
-        android:layout_width="100dp"
-        android:layout_height="130dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+
 
     <Button
         android:id="@+id/btn_run"
@@ -26,7 +17,6 @@
         android:background="@color/colorAccent"
         android:padding="10dp"
         android:text="Show"
-        android:layout_below="@+id/view_finder"
         android:textColor="@android:color/white"
         android:textSize="25sp" />
 

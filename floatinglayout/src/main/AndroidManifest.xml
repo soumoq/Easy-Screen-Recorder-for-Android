@@ -2,6 +2,7 @@
     package="io.hamed.floatinglayout">
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application>
         <service android:name="io.hamed.floatinglayout.FloatingLayoutService" />

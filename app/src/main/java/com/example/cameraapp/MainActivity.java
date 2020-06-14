@@ -16,6 +16,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,14 +31,16 @@ import org.jetbrains.annotations.Nullable;
 import io.hamed.floatinglayout.CallBack;
 import io.hamed.floatinglayout.FloatingLayout;
 
+import static android.widget.Toast.LENGTH_LONG;
+
 
 public class MainActivity extends AppCompatActivity implements CallBack {
 
-    private static final int MY_PERMISSIONS_CAMERA=1;
+    private static final int MY_PERMISSIONS_CAMERA = 1;
     private static final int CODE_DRAW_OVER_OTHER_APP_PERMISSION = 2084;
     private int REQUEST_CODE_PERMISSIONS = 101;
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
-    private TextureView textureView;
+    //private TextureView textureView;
     private FloatingLayout floatingLayout;
     Button button;
 
@@ -47,13 +50,12 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         setContentView(R.layout.activity_main);
 
 
+        //textureView = findViewById(R.id.view_finder);
+        button = (Button) findViewById(R.id.btn_run);
 
-        textureView = findViewById(R.id.view_finder);
-        button=(Button)findViewById(R.id.btn_run);
-
-        if(allPermissionsGranted()){
-            startCamera(); //start camera if permission has been granted by user
-        } else{
+        if (allPermissionsGranted()) {
+            //startCamera(textureView); //start camera if permission has been granted by user
+        } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
 
@@ -68,28 +70,27 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         }
 
 
-        floatingLayout= new FloatingLayout(this,R.layout.floting_layout,this);
+        floatingLayout = new FloatingLayout(getApplicationContext(), R.layout.floting_layout, MainActivity.this);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //btn_run.setOnClickListener { if (!floatingLayout!!.isShow()) floatingLayout!!.create() }
-                if(!floatingLayout.isShow())
+                if (!floatingLayout.isShow()) {
                     floatingLayout.create();
-                else
-                    Toast.makeText(MainActivity.this,"Not running",Toast.LENGTH_LONG).show();
-
+                } else {
+                    Toast.makeText(MainActivity.this, "Not running", LENGTH_LONG).show();
+                }
             }
         });
 
     }
 
 
-
     @SuppressLint("RestrictedApi")
-    private void startCamera() {
+    private void startCamera(TextureView textureView) {
 
         CameraX.unbindAll();
-        Rational aspectRatio = new Rational (textureView.getWidth(), textureView.getHeight());
+        Rational aspectRatio = new Rational(textureView.getWidth(), textureView.getHeight());
         Size screen = new Size(textureView.getWidth(), textureView.getHeight()); //size of the screen
 
         PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(CameraX.LensFacing.FRONT).build();
@@ -97,33 +98,31 @@ public class MainActivity extends AppCompatActivity implements CallBack {
 
         try {
             CameraX.getCameraWithLensFacing(CameraX.LensFacing.FRONT);
-        }catch (Exception e)
-        {
-            Toast.makeText(this,"Exception: "+e,Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Exception: " + e, LENGTH_LONG).show();
         }
 
         preview.setOnPreviewOutputUpdateListener(
                 new Preview.OnPreviewOutputUpdateListener() {
                     //to update the surface texture we  have to destroy it first then re-add it
                     @Override
-                    public void onUpdated(Preview.PreviewOutput output){
+                    public void onUpdated(Preview.PreviewOutput output) {
                         ViewGroup parent = (ViewGroup) textureView.getParent();
                         parent.removeView(textureView);
                         parent.addView(textureView, 0);
 
 
                         textureView.setSurfaceTexture(output.getSurfaceTexture());
-                        updateTransform();
+                        updateTransform(textureView);
                     }
                 });
 
 
-
         //bind to lifecycle:
-        CameraX.bindToLifecycle((LifecycleOwner)this, preview);
+        CameraX.bindToLifecycle((LifecycleOwner) this, preview);
     }
 
-    private void updateTransform(){
+    private void updateTransform(TextureView textureView) {
         Matrix mx = new Matrix();
         float w = textureView.getMeasuredWidth();
         float h = textureView.getMeasuredHeight();
@@ -132,9 +131,9 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         float cY = h / 2f;
 
         int rotationDgr;
-        int rotation = (int)textureView.getRotation();
+        int rotation = (int) textureView.getRotation();
 
-        switch(rotation){
+        switch (rotation) {
             case Surface.ROTATION_0:
                 rotationDgr = 0;
                 break;
@@ -151,16 +150,15 @@ public class MainActivity extends AppCompatActivity implements CallBack {
                 return;
         }
 
-        mx.postRotate((float)rotationDgr, cX, cY);
+        mx.postRotate((float) rotationDgr, cX, cY);
         textureView.setTransform(mx);
     }
 
-    private boolean allPermissionsGranted()
-    {
+    private boolean allPermissionsGranted() {
         //When permission is not granted by user, show them message why this permission is needed.
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.CAMERA)) {
-            Toast.makeText(this, "Please grant permissions to camera", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Please grant permissions to camera", LENGTH_LONG).show();
 
             //Give user option to still opt-in the permissions
             ActivityCompat.requestPermissions(this,
@@ -176,19 +174,32 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         return true;
     }
 
+
     @Override
     public void onClickListener(int resourceId) {
         if (resourceId == R.id.btn_close)
             floatingLayout.close();
+
+
     }
 
+    @SuppressLint({"SetTextI18n", "RestrictedApi"})
     @Override
     public void onCreateListener(@Nullable View view) {
         Toast.makeText(this, "On Create", Toast.LENGTH_SHORT).show();
+        TextureView textureView123 = (TextureView) view.findViewById(R.id.view_finder123);
+
+        if (allPermissionsGranted()) {
+            startCamera(textureView123);
+        }
+
+        TextView textView = (TextView) view.findViewById(R.id.txtv);
+        textView.setText("How is it");
     }
 
     @Override
     public void onCloseListener() {
         Toast.makeText(this, "On Destroy", Toast.LENGTH_SHORT).show();
     }
+
 }

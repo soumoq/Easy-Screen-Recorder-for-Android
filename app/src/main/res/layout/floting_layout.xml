@@ -6,30 +6,36 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/root_container"
-        android:layout_width="250dp"
+        android:layout_width="100dp"
         android:layout_height="200dp"
         app:cardBackgroundColor="@android:color/white"
         app:cardCornerRadius="3dp"
         app:cardElevation="6dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="10dp">
 
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@mipmap/ic_launcher" />
-
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:text="Hello World"
-                android:textSize="15sp" />
+                android:text="hi"
+                android:id="@+id/txtv"
+                />
+
+            <TextureView
+                android:id="@+id/view_finder123"
+                android:layout_width="100dp"
+                android:layout_height="130dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
             <Button
                 android:id="@+id/btn_close"
@@ -38,10 +44,11 @@
                 android:background="@color/colorAccent"
                 android:tag="Click"
                 android:text="Close"
+                android:layout_below="@+id/view_finder123"
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </androidx.cardview.widget.CardView>
 

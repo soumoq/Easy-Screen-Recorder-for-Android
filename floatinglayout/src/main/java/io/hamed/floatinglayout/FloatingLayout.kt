@@ -2,8 +2,11 @@ package io.hamed.floatinglayout
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Handler
+import android.view.TextureView
 import androidx.annotation.LayoutRes
+import androidx.annotation.RequiresApi
 
 
 /**
@@ -49,5 +52,4 @@ class FloatingLayout(
     override fun isShow(): Boolean {
         return isShow
     }
-
 }
