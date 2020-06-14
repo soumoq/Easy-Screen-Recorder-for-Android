@@ -1,48 +1,89 @@
 package com.example.cameraapp;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.*;
-import androidx.core.app.*;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LifecycleOwner;
-
-
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.graphics.Matrix;
-import android.os.*;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Rational;
 import android.util.Size;
-import android.view.*;
+import android.view.MotionEvent;
+import android.view.Surface;
+import android.view.TextureView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
-import java.io.File;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.CameraX;
+import androidx.camera.core.Preview;
+import androidx.camera.core.PreviewConfig;
+import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.LifecycleOwner;
+
+import org.jetbrains.annotations.Nullable;
+
+import io.hamed.floatinglayout.CallBack;
+import io.hamed.floatinglayout.FloatingLayout;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CallBack {
 
     private static final int MY_PERMISSIONS_CAMERA=1;
+    private static final int CODE_DRAW_OVER_OTHER_APP_PERMISSION = 2084;
     private int REQUEST_CODE_PERMISSIONS = 101;
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
-    TextureView textureView;
+    private TextureView textureView;
+    private FloatingLayout floatingLayout;
+    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         textureView = findViewById(R.id.view_finder);
+        button=(Button)findViewById(R.id.btn_run);
 
         if(allPermissionsGranted()){
             startCamera(); //start camera if permission has been granted by user
         } else{
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(
+                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:$packageName")
+                );
+                startActivityForResult(intent, 25);
+            }
+        }
+
+
+        floatingLayout= new FloatingLayout(this,R.layout.floting_layout,this);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //btn_run.setOnClickListener { if (!floatingLayout!!.isShow()) floatingLayout!!.create() }
+                if(!floatingLayout.isShow())
+                    floatingLayout.create();
+                else
+                    Toast.makeText(MainActivity.this,"Not running",Toast.LENGTH_LONG).show();
+
+            }
+        });
+
     }
+
+
 
     @SuppressLint("RestrictedApi")
     private void startCamera() {
@@ -133,5 +174,21 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    @Override
+    public void onClickListener(int resourceId) {
+        if (resourceId == R.id.btn_close)
+            floatingLayout.close();
+    }
+
+    @Override
+    public void onCreateListener(@Nullable View view) {
+        Toast.makeText(this, "On Create", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCloseListener() {
+        Toast.makeText(this, "On Destroy", Toast.LENGTH_SHORT).show();
     }
 }
