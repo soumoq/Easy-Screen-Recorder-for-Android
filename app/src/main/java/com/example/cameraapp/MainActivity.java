@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
     //private TextureView textureView;
     private FloatingLayout floatingLayout;
-    Button button;
+    private Button button,switchActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements CallBack {
 
         //textureView = findViewById(R.id.view_finder);
         button = (Button) findViewById(R.id.btn_run);
+        switchActivity=(Button) findViewById(R.id.switchActivity);
+
 
         if (allPermissionsGranted()) {
             //startCamera(textureView); //start camera if permission has been granted by user
@@ -92,6 +94,14 @@ public class MainActivity extends AppCompatActivity implements CallBack {
             }
         });
 
+        switchActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent=new Intent(MainActivity.this,Test.class);
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -117,8 +127,9 @@ public class MainActivity extends AppCompatActivity implements CallBack {
                     @Override
                     public void onUpdated(Preview.PreviewOutput output) {
                         ViewGroup parent = (ViewGroup) textureView.getParent();
-                        parent.removeView(textureView);
-                        parent.addView(textureView, 0);
+                        //parent.removeView(textureView);
+                        //parent.addView(textureView, 0);
+
 
 
                         textureView.setSurfaceTexture(output.getSurfaceTexture());
@@ -128,7 +139,10 @@ public class MainActivity extends AppCompatActivity implements CallBack {
 
 
         //bind to lifecycle:
-        CameraX.bindToLifecycle((LifecycleOwner) this, preview);
+        CameraXLifeCycle lifeCycle=new CameraXLifeCycle();
+        lifeCycle.doOnResume();
+        CameraX.bindToLifecycle(lifeCycle, preview);
+
     }
 
     private void updateTransform(TextureView textureView) {
@@ -196,16 +210,11 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     @Override
     public void onCreateListener(@Nullable View view) {
         Toast.makeText(this, "On Create", Toast.LENGTH_SHORT).show();
-        //TextureView textureView123 = (TextureView) view.findViewById(R.id.view_finder123);
+        TextureView textureView123 = (TextureView) view.findViewById(R.id.view_finder123);
 
         if (allPermissionsGranted()) {
-            int camId= Camera.CameraInfo.CAMERA_FACING_FRONT;
-            //open camera
-            FrameLayout frameLayout = (FrameLayout) view.findViewById(R.id.collapsed_iv);
-            Camera camera = Camera.open(camId);
+            startCamera(textureView123);
 
-            ShowCamera showCamera = new ShowCamera(this, camera);
-            frameLayout.addView(showCamera);
         }
 
         TextView textView = (TextView) view.findViewById(R.id.txtv);
@@ -220,77 +229,3 @@ public class MainActivity extends AppCompatActivity implements CallBack {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-class ShowCamera extends SurfaceView implements SurfaceHolder.Callback {
-    private Camera camera;
-    private SurfaceHolder holder;
-
-
-    public ShowCamera(Context context, Camera camera) {
-        super(context);
-        this.camera = camera;
-        holder = getHolder();
-        holder.addCallback(this);
-
-
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-
-        Camera.Parameters parameters = camera.getParameters();
-
-        //change the orientation of the camera
-
-        List<Camera.Size> sizes=parameters.getSupportedPictureSizes();
-        Camera.Size mSize=null;
-
-        for (Camera.Size size: sizes)
-        {
-            mSize=size;
-        }
-
-        if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
-            parameters.set("orientation", "portrait");
-            camera.setDisplayOrientation(90);
-            parameters.setRotation(90);
-        } else {
-            parameters.set("orientation", "landscape");
-            camera.setDisplayOrientation(0);
-            parameters.setRotation(0);
-        }
-
-        parameters.setPictureSize(mSize.width,mSize.height);
-
-
-        camera.setParameters(parameters);
-        try {
-            camera.setPreviewDisplay(holder);
-            camera.startPreview();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        camera.stopPreview();
-        camera.release();
-    }
-}

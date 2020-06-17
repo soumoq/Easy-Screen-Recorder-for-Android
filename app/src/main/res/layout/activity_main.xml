@@ -7,7 +7,6 @@
     tools:context=".MainActivity">
 
 
-
     <Button
         android:id="@+id/btn_run"
         android:layout_width="150dp"
@@ -19,6 +18,14 @@
         android:text="Show"
         android:textColor="@android:color/white"
         android:textSize="25sp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="switch activity"
+        android:id="@+id/switchActivity"
+        android:layout_below="@+id/btn_run"
+        />
 
 
 </RelativeLayout>
