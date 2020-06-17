@@ -20,5 +20,4 @@ public class CameraXLifeCycle implements LifecycleOwner {
     public Lifecycle getLifecycle() {
         return lifecycleRegistry;
     }
-
 }

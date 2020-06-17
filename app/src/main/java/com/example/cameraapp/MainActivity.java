@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Matrix;
 import android.hardware.Camera;
@@ -24,13 +25,17 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraX;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
     //private TextureView textureView;
     private FloatingLayout floatingLayout;
-    private Button button,switchActivity;
+    private Button button, switchActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
 
         //textureView = findViewById(R.id.view_finder);
         button = (Button) findViewById(R.id.btn_run);
-        switchActivity=(Button) findViewById(R.id.switchActivity);
+        switchActivity = (Button) findViewById(R.id.switchActivity);
 
 
         if (allPermissionsGranted()) {
@@ -98,10 +103,11 @@ public class MainActivity extends AppCompatActivity implements CallBack {
             @Override
             public void onClick(View v) {
 
-                Intent intent=new Intent(MainActivity.this,Test.class);
+                Intent intent = new Intent(MainActivity.this, Test.class);
                 startActivity(intent);
             }
         });
+
     }
 
 
@@ -131,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements CallBack {
                         //parent.addView(textureView, 0);
 
 
-
                         textureView.setSurfaceTexture(output.getSurfaceTexture());
                         updateTransform(textureView);
                     }
@@ -139,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
 
 
         //bind to lifecycle:
-        CameraXLifeCycle lifeCycle=new CameraXLifeCycle();
+        CameraXLifeCycle lifeCycle = new CameraXLifeCycle();
         lifeCycle.doOnResume();
         CameraX.bindToLifecycle(lifeCycle, preview);
 
