@@ -22,10 +22,18 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="switch activity"
+        android:text="Recording"
         android:id="@+id/switchActivity"
         android:layout_below="@+id/btn_run"
         />
+
+    <ToggleButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/toggleButton"
+        android:layout_alignParentBottom="true"
+        android:textOff="Record"
+        android:textOn="Stop"/>
 
 
 </RelativeLayout>

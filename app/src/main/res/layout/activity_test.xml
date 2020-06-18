@@ -7,19 +7,8 @@
     android:layout_height="match_parent"
     tools:context=".Test">
 
-    <ToggleButton
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/toggleButton"
-        android:layout_alignParentBottom="true"
-        android:textOff="Record"
-        android:textOn="Stop"/>
 
-    <VideoView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/videoView"
-        android:layout_above="@id/toggleButton"
-        android:visibility="invisible"/>
+
+
 
 </RelativeLayout>
