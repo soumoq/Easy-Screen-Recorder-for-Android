@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     private VirtualDisplay mVirtualDisplay;
     private MediaProjectionCallback mMediaProjectionCallback;
     private MediaRecorder mMediaRecorder;
+    private ToggleButton mToggleButton;
 
     private int mScreenDensity;
     private static final int DISPLAY_WIDTH = 720;
@@ -88,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     }
 
     private RelativeLayout mRootLayout;
-    private ToggleButton mToggleButton;
     private String mVideoUrl="";
 
 
@@ -161,43 +161,9 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         mMediaRecorder = new MediaRecorder();
         mMediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
 
-        mToggleButton = findViewById(R.id.toggleButton);
+
         mRootLayout = findViewById(R.id.rootLayout);
 
-        mToggleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) +
-                        ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
-                            ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.RECORD_AUDIO)) {
-                        mToggleButton.setChecked(false);
-                        Snackbar.make(mRootLayout, "Permission", Snackbar.LENGTH_INDEFINITE)
-                                .setAction("Enable", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        ActivityCompat.requestPermissions(MainActivity.this,
-                                                new String[]{
-                                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                                        Manifest.permission.RECORD_AUDIO
-                                                },
-                                                REQUEST_PERMISSION);
-                                    }
-                                });
-                    } else {
-                        ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                        Manifest.permission.RECORD_AUDIO
-                                },
-                                REQUEST_PERMISSION);
-                    }
-                } else {
-                    toggleScreenShare(v);
-                }
-            }
-        });
 
     }
 
@@ -462,6 +428,45 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     @Override
     public void onCreateListener(@Nullable View view) {
         Toast.makeText(this, "On Create", Toast.LENGTH_SHORT).show();
+
+
+        mToggleButton=view.findViewById(R.id.toggleButton1);
+        mToggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) +
+                        ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+                            ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.RECORD_AUDIO)) {
+                        mToggleButton.setChecked(false);
+                        Snackbar.make(mRootLayout, "Permission", Snackbar.LENGTH_INDEFINITE)
+                                .setAction("Enable", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        ActivityCompat.requestPermissions(MainActivity.this,
+                                                new String[]{
+                                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                                        Manifest.permission.RECORD_AUDIO
+                                                },
+                                                REQUEST_PERMISSION);
+                                    }
+                                });
+                    } else {
+                        ActivityCompat.requestPermissions(MainActivity.this,
+                                new String[]{
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                        Manifest.permission.RECORD_AUDIO
+                                },
+                                REQUEST_PERMISSION);
+                    }
+                } else {
+                    toggleScreenShare(v);
+                }
+            }
+        });
+
+
 
         ImageView closeBtn=view.findViewById(R.id.btn_close);
         closeBtn.setOnClickListener(new View.OnClickListener() {

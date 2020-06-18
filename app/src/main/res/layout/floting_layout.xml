@@ -2,21 +2,21 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="100dp"
-    android:layout_height="200dp"
+    android:layout_height="220dp"
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/root_container"
-        android:layout_width="100dp"
-        android:layout_height="200dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:cardBackgroundColor="@android:color/white"
         app:cardCornerRadius="3dp"
         app:cardElevation="6dp">
 
         <RelativeLayout
             android:layout_width="100dp"
+            android:layout_height="220dp"
             android:id="@+id/root_relative"
-            android:layout_height="200dp"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="10dp">
@@ -24,7 +24,7 @@
             <TextureView
                 android:id="@+id/view_finder123"
                 android:layout_width="wrap_content"
-                android:layout_height="170dp"
+                android:layout_height="160dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
@@ -36,8 +36,8 @@
             <ImageView
                 android:id="@+id/btn_close"
                 android:tag="close"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_marginLeft="40dp"
                 android:src="@drawable/ic_close"
                 android:text="Close"
@@ -47,11 +47,22 @@
 
             <ImageView
                 android:id="@+id/open_button"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_below="@+id/view_finder123"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_alignParentBottom="true"
                 android:src="@drawable/ic_baseline_fullscreen_24"
                 tools:ignore="NotSibling" />
+
+            <ToggleButton
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:id="@+id/toggleButton1"
+                android:layout_below="@+id/view_finder123"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:textOff="1"
+                android:textOn="0"/>
+
         </RelativeLayout>
 
     </androidx.cardview.widget.CardView>
