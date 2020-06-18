@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -454,9 +455,6 @@ public class MainActivity extends AppCompatActivity implements CallBack {
 
     @Override
     public void onClickListener(int resourceId) {
-        if (resourceId == R.id.btn_close)
-            floatingLayout.close();
-
 
     }
 
@@ -464,6 +462,26 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     @Override
     public void onCreateListener(@Nullable View view) {
         Toast.makeText(this, "On Create", Toast.LENGTH_SHORT).show();
+
+        ImageView closeBtn=view.findViewById(R.id.btn_close);
+        closeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                floatingLayout.close();
+            }
+        });
+
+        ImageView openBtn=view.findViewById(R.id.open_button);
+        openBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            }
+        });
+
         TextureView textureView123 = (TextureView) view.findViewById(R.id.view_finder123);
 
         if (allPermissionsGranted()) {
@@ -471,8 +489,6 @@ public class MainActivity extends AppCompatActivity implements CallBack {
 
         }
 
-        TextView textView = (TextView) view.findViewById(R.id.txtv);
-        textView.setText("How is it");
     }
 
     @Override
