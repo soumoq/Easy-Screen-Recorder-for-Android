@@ -60,11 +60,14 @@ import java.util.List;
 
 import io.hamed.floatinglayout.CallBack;
 import io.hamed.floatinglayout.FloatingLayout;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
 
 import static android.widget.Toast.LENGTH_LONG;
 
 
-public class MainActivity extends AppCompatActivity implements CallBack {
+public class MainActivity extends AppCompatActivity implements CallBack,EasyPermissions.PermissionCallbacks {
 
 
     private static final int REQUEST_CODE = 1000;
@@ -111,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         setContentView(R.layout.activity_main);
 
         grantPermission();
+        grantAllPermission();
 
         button = (Button) findViewById(R.id.btn_run);
         switchActivity = (Button) findViewById(R.id.switchActivity);
@@ -157,6 +161,22 @@ public class MainActivity extends AppCompatActivity implements CallBack {
             startActivityForResult(intent, 0);
         }
     }
+
+    @AfterPermissionGranted(123)
+    private void grantAllPermission()
+    {
+        String[] perms={Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO};
+        if(EasyPermissions.hasPermissions(this,perms))
+        {
+            Toast.makeText(this,"Permission granted",LENGTH_LONG).show();
+        }
+        else
+        {
+            EasyPermissions.requestPermissions(this, "to access camera",
+                    123,perms);
+        }
+    }
+
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -226,8 +246,12 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if(requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE){
+
+        }
+
         if (requestCode != REQUEST_CODE) {
-            Toast.makeText(this, "Unk error", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Unk error", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -243,6 +267,19 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         mVirtualDisplay = createVirtualDisplay();
         mMediaRecorder.start();
     }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        if(EasyPermissions.somePermissionPermanentlyDenied(this,perms)){
+            new AppSettingsDialog.Builder(this).build().show();
+        }
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private class MediaProjectionCallback extends MediaProjection.Callback {
