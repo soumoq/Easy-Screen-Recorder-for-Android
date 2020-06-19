@@ -2,32 +2,29 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
 
     <Button
         android:id="@+id/btn_run"
-        android:layout_width="150dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="25dp"
         android:background="@color/colorAccent"
         android:padding="10dp"
-        android:text="Show"
-        android:textColor="@android:color/white"
-        android:textSize="25sp" />
+        android:text="open CardView"
+        android:textColor="@android:color/white" />
 
     <Button
+        android:id="@+id/switchActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Recording"
-        android:id="@+id/switchActivity"
         android:layout_below="@+id/btn_run"
-        />
-
+        android:text="Recording" />
 
 
 </RelativeLayout>

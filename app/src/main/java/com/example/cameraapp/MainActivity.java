@@ -54,6 +54,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     }
 
     private RelativeLayout mRootLayout;
-    private String mVideoUrl="";
+    private String mVideoUrl = "";
 
 
     private static final int MY_PERMISSIONS_CAMERA = 1;
@@ -100,32 +101,20 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     private FloatingLayout floatingLayout;
     private Button button, switchActivity;
 
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
+
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        grantPermission();
 
-        //textureView = findViewById(R.id.view_finder);
         button = (Button) findViewById(R.id.btn_run);
         switchActivity = (Button) findViewById(R.id.switchActivity);
-
-
-        if (allPermissionsGranted()) {
-            //startCamera(textureView); //start camera if permission has been granted by user
-        } else {
-            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(this)) {
-                Intent intent = new Intent(
-                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:$packageName")
-                );
-                startActivityForResult(intent, 25);
-            }
-        }
+        mRootLayout = findViewById(R.id.rootLayout);
 
 
         floatingLayout = new FloatingLayout(getApplicationContext(), R.layout.floting_layout, MainActivity.this);
@@ -151,8 +140,6 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         });
 
 
-
-
         //screen recode
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -161,20 +148,22 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         mMediaRecorder = new MediaRecorder();
         mMediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
 
-
-        mRootLayout = findViewById(R.id.rootLayout);
-
-
     }
 
-
-
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void grantPermission() {
+        if (!Settings.canDrawOverlays(this)) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, 0);
+        }
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void toggleScreenShare(View v) {
         ToggleButton toggleButton = (ToggleButton) v;
         if (toggleButton.isChecked()) {
+            Toast.makeText(this, "Start recording", LENGTH_LONG).show();
             initRecorder();
             reocrdScreen();
         } else {
@@ -281,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
 
         mVirtualDisplay.release();
         destroyMediaProjection();
+        Toast.makeText(this, "Recording stop", LENGTH_LONG).show();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -322,11 +312,6 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     }
 
 
-
-
-
-
-
     @SuppressLint("RestrictedApi")
     private void startCamera(TextureView textureView) {
 
@@ -349,8 +334,8 @@ public class MainActivity extends AppCompatActivity implements CallBack {
                     @Override
                     public void onUpdated(Preview.PreviewOutput output) {
                         ViewGroup parent = (ViewGroup) textureView.getParent();
-                        //parent.removeView(textureView);
-                        //parent.addView(textureView, 0);
+                        parent.removeView(textureView);
+                        parent.addView(textureView, 0);
 
 
                         textureView.setSurfaceTexture(output.getSurfaceTexture());
@@ -430,7 +415,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         Toast.makeText(this, "On Create", Toast.LENGTH_SHORT).show();
 
 
-        mToggleButton=view.findViewById(R.id.toggleButton1);
+        mToggleButton = view.findViewById(R.id.toggleButton1);
         mToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -467,8 +452,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         });
 
 
-
-        ImageView closeBtn=view.findViewById(R.id.btn_close);
+        ImageView closeBtn = view.findViewById(R.id.btn_close);
         closeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -476,11 +460,11 @@ public class MainActivity extends AppCompatActivity implements CallBack {
             }
         });
 
-        ImageView openBtn=view.findViewById(R.id.open_button);
+        ImageView openBtn = view.findViewById(R.id.open_button);
         openBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(MainActivity.this,MainActivity.class);
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
