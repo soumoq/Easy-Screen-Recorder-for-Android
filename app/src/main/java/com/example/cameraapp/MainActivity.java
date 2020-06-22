@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
         String[] perms={Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO};
         if(EasyPermissions.hasPermissions(this,perms))
         {
-            Toast.makeText(this,"Permission granted",LENGTH_LONG).show();
+            Toast.makeText(this,"Ready to start",LENGTH_LONG).show();
         }
         else
         {
@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
     @SuppressLint({"SetTextI18n", "RestrictedApi"})
     @Override
     public void onCreateListener(@Nullable View view) {
-        Toast.makeText(this, "On Create", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Open webcam", Toast.LENGTH_SHORT).show();
 
 
         mToggleButton = view.findViewById(R.id.toggleButton1);
@@ -519,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
 
     @Override
     public void onCloseListener() {
-        Toast.makeText(this, "On Destroy", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Close webcam", Toast.LENGTH_SHORT).show();
     }
 
 }
