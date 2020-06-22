@@ -73,8 +73,9 @@
             android:id="@+id/toggleButton1"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:textOff="1"
-            android:textOn="0"/>
+            android:background="@drawable/toggle_selector"
+            android:textOff=""
+            android:textOn=""/>
 
     </RelativeLayout>
 </FrameLayout>
