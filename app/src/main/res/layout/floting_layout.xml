@@ -1,34 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="150dp"
-    android:layout_height="180dp"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_layout"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_width="150dp"
+    android:layout_height="150dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/root_container"
-        android:layout_marginTop="0dp"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        app:cardCornerRadius="0dp"
         app:cardBackgroundColor="#515A5A"
-        android:fadingEdge="vertical"
+        app:cardUseCompatPadding="true"
         app:cardElevation="0dp">
 
         <RelativeLayout
-            android:layout_width="150dp"
-            android:layout_height="150dp"
             android:id="@+id/root_relative"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
-            android:orientation="vertical"
-            android:padding="10dp">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextureView
                 android:id="@+id/view_finder123"
                 android:layout_width="wrap_content"
-                android:layout_height="160dp"
+                android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -40,14 +37,13 @@
             <!--Close button-->
             <ImageView
                 android:id="@+id/btn_close"
-                android:tag="close"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_centerHorizontal="true"
                 android:src="@drawable/ic_baseline_close_24"
+                android:tag="close"
                 android:text="Close"
-                tools:ignore="ContentDescription"
-                />
+                tools:ignore="ContentDescription" />
 
 
             <ImageView
@@ -59,23 +55,17 @@
                 tools:ignore="NotSibling" />
 
 
+            <ToggleButton
+                android:id="@+id/toggleButton1"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/toggle_selector"
+                android:textOff=""
+                android:textOn="" />
+
+
         </RelativeLayout>
-
     </androidx.cardview.widget.CardView>
-
-    <RelativeLayout
-        android:layout_width="150dp"
-        android:layout_height="180dp">
-
-        <ToggleButton
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:id="@+id/toggleButton1"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/toggle_selector"
-            android:textOff=""
-            android:textOn=""/>
-
-    </RelativeLayout>
 </FrameLayout>

@@ -16,7 +16,7 @@
         android:layout_marginTop="25dp"
         android:background="@color/colorAccent"
         android:padding="10dp"
-        android:text="open CardView"
+        android:text="open webcam"
         android:textColor="@android:color/white" />
 
     <Button
