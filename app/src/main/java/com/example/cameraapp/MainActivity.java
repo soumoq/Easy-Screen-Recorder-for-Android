@@ -44,6 +44,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraX;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
@@ -129,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
                 if (!floatingLayout.isShow()) {
                     floatingLayout.create();
                 } else {
-                    Toast.makeText(MainActivity.this, "Not running", LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Already Running", LENGTH_LONG).show();
                 }
             }
         });
@@ -451,7 +452,8 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
     public void onCreateListener(@Nullable View view) {
         Toast.makeText(this, "Open webcam", Toast.LENGTH_SHORT).show();
 
-
+        CardView cardView=(CardView)view.findViewById(R.id.root_container);
+        cardView.setCardElevation(0);
         mToggleButton = view.findViewById(R.id.toggleButton1);
         mToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
