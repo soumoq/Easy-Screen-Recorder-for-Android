@@ -11,6 +11,7 @@ import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
@@ -30,6 +31,7 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -68,7 +70,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 import static android.widget.Toast.LENGTH_LONG;
 
 
-public class MainActivity extends AppCompatActivity implements CallBack,EasyPermissions.PermissionCallbacks {
+public class MainActivity extends AppCompatActivity implements CallBack, EasyPermissions.PermissionCallbacks {
 
 
     private static final int REQUEST_CODE = 1000;
@@ -83,9 +85,10 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
     private ToggleButton mToggleButton;
 
     private int mScreenDensity;
-    private static final int DISPLAY_WIDTH = 720;
-    private static final int DISPLAY_HEIGHT = 1280;
+    private int DISPLAY_WIDTH;
+    private int DISPLAY_HEIGHT;
 
+    public static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {
         ORIENTATION.append(Surface.ROTATION_0, 90);
         ORIENTATION.append(Surface.ROTATION_90, 0);
@@ -164,27 +167,22 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
     }
 
     @AfterPermissionGranted(123)
-    private void grantAllPermission()
-    {
-        String[] perms={Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO};
-        if(EasyPermissions.hasPermissions(this,perms))
-        {
-            Toast.makeText(this,"Ready to start",LENGTH_LONG).show();
-        }
-        else
-        {
+    private void grantAllPermission() {
+        String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            Toast.makeText(this, "Ready to start", LENGTH_LONG).show();
+        } else {
             EasyPermissions.requestPermissions(this, "to access camera",
-                    123,perms);
+                    123, perms);
         }
     }
-
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void toggleScreenShare(View v) {
         ToggleButton toggleButton = (ToggleButton) v;
         if (toggleButton.isChecked()) {
-            Toast.makeText(this, "Start recording", LENGTH_LONG).show();
+            Toast.makeText(this, "Recording start", LENGTH_LONG).show();
             initRecorder();
             reocrdScreen();
         } else {
@@ -218,6 +216,17 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
 
     private void initRecorder() {
         try {
+
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            DISPLAY_WIDTH = metrics.widthPixels;
+            DISPLAY_HEIGHT = metrics.heightPixels;
+
+            //mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            //mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+
+
+            CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -230,15 +239,18 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
             mMediaRecorder.setVideoSize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
             mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-            mMediaRecorder.setVideoEncodingBitRate(512 * 1000);
-            mMediaRecorder.setVideoFrameRate(30);
+            mMediaRecorder.setVideoEncodingBitRate(cpHigh.videoBitRate);
+            mMediaRecorder.setVideoFrameRate(cpHigh.videoFrameRate);
+
 
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
-            int orientation = ORIENTATION.get(rotation + 90);
+            int orientation = ORIENTATIONS.get(rotation + 90);
+
             mMediaRecorder.setOrientationHint(orientation);
             mMediaRecorder.prepare();
+
         } catch (IOException e) {
-            e.printStackTrace();
+            Toast.makeText(this,"Exception: "+e,LENGTH_LONG).show();
         }
     }
 
@@ -247,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE){
+        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
 
         }
 
@@ -276,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
 
     @Override
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
-        if(EasyPermissions.somePermissionPermanentlyDenied(this,perms)){
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
             new AppSettingsDialog.Builder(this).build().show();
         }
     }
@@ -315,6 +327,7 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
     private void destroyMediaProjection() {
         if (mMediaProjection != null) {
             mMediaProjection.unregisterCallback(mMediaProjectionCallback);
+            Toast.makeText(MainActivity.this, "Recoding stop", LENGTH_LONG).show();
             mMediaProjection.stop();
             mMediaProjection = null;
         }
@@ -452,7 +465,7 @@ public class MainActivity extends AppCompatActivity implements CallBack,EasyPerm
     public void onCreateListener(@Nullable View view) {
         Toast.makeText(this, "Open webcam", Toast.LENGTH_SHORT).show();
 
-        CardView cardView=(CardView)view.findViewById(R.id.root_container);
+        CardView cardView = (CardView) view.findViewById(R.id.root_container);
         cardView.setCardElevation(0);
         mToggleButton = view.findViewById(R.id.toggleButton1);
         mToggleButton.setOnClickListener(new View.OnClickListener() {
