@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         mMediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
         radioGroup.check(R.id.radioButton2);
-        quality="mid";
+        quality = "mid";
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @SuppressLint("ResourceType")
@@ -172,11 +172,11 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
                 RadioButton rb = (RadioButton) group.findViewById(checkedId);
                 if (null != rb && checkedId > -1) {
                     if (rb.getText().equals("High quality")) {
-                        quality="high";
+                        quality = "high";
                     } else if (rb.getText().equals("Medium quality")) {
-                        quality="mid";
+                        quality = "mid";
                     } else if (rb.getText().equals("Low quality")) {
-                        quality="low";
+                        quality = "low";
                     }
                 }
             }
@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
     private void initRecorderHighResolution() {
         try {
-            Toast.makeText(this,"Recoding quality high",LENGTH_LONG).show();
+            Toast.makeText(this, "Recoding quality high", LENGTH_LONG).show();
 
             DisplayMetrics metrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
     private void initRecorderLowResolution() {
         try {
-            Toast.makeText(this,"Recoding quality low",LENGTH_LONG).show();
+            Toast.makeText(this, "Recoding quality low", LENGTH_LONG).show();
 
             DisplayMetrics metrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -333,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
     private void initRecorderMidResolution() {
         try {
-            Toast.makeText(this,"Recoding quality medium",LENGTH_LONG).show();
+            Toast.makeText(this, "Recoding quality medium", LENGTH_LONG).show();
 
 
             DisplayMetrics metrics = new DisplayMetrics();
