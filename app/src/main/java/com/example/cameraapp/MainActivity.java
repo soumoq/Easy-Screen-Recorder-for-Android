@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     private int DISPLAY_HEIGHT;
 
     public static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+
     static {
         ORIENTATION.append(Surface.ROTATION_0, 90);
         ORIENTATION.append(Surface.ROTATION_90, 0);
@@ -109,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     private Button button, switchActivity;
 
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
+
+    private String quality;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -183,8 +186,16 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         ToggleButton toggleButton = (ToggleButton) v;
         if (toggleButton.isChecked()) {
             Toast.makeText(this, "Recording start", LENGTH_LONG).show();
-            initRecorder();
-            reocrdScreen();
+
+            quality="mid";
+            if(quality.equals("high"))
+                initRecorderHighResolution();
+            else if(quality.equals("low"))
+                initRecorderLowResolution();
+            else if(quality.equals("mid"))
+                initRecorderMidResolution();
+
+           reocrdScreen();
         } else {
             mMediaRecorder.stop();
             mMediaRecorder.reset();
@@ -214,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
                 null, null);
     }
 
-    private void initRecorder() {
+    private void initRecorderHighResolution() {
         try {
 
             DisplayMetrics metrics = new DisplayMetrics();
@@ -250,7 +261,89 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             mMediaRecorder.prepare();
 
         } catch (IOException e) {
-            Toast.makeText(this,"Exception: "+e,LENGTH_LONG).show();
+            Toast.makeText(this, "Exception: " + e, LENGTH_LONG).show();
+        }
+    }
+
+
+    private void initRecorderLowResolution() {
+        try {
+
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            DISPLAY_WIDTH = metrics.widthPixels;
+            DISPLAY_HEIGHT = metrics.heightPixels;
+
+            //mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            //mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+
+
+            CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_LOW);
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+
+            mVideoUrl = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) +
+                    new StringBuilder("/screen_record-").append(new SimpleDateFormat("dd-MM-yyy-hh_mm_ss")
+                            .format(new Date())).append(".mp4").toString();
+
+            mMediaRecorder.setOutputFile(mVideoUrl);
+            mMediaRecorder.setVideoSize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mMediaRecorder.setVideoEncodingBitRate(cpHigh.videoBitRate);
+            mMediaRecorder.setVideoFrameRate(cpHigh.videoFrameRate);
+
+
+            int rotation = getWindowManager().getDefaultDisplay().getRotation();
+            int orientation = ORIENTATIONS.get(rotation + 90);
+
+            mMediaRecorder.setOrientationHint(orientation);
+            mMediaRecorder.prepare();
+
+        } catch (IOException e) {
+            Toast.makeText(this, "Exception: " + e, LENGTH_LONG).show();
+        }
+    }
+
+
+    private void initRecorderMidResolution(){
+        try {
+
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            DISPLAY_WIDTH = metrics.widthPixels;
+            DISPLAY_HEIGHT = metrics.heightPixels;
+
+            //mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            //mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+
+
+            CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+
+            mVideoUrl = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) +
+                    new StringBuilder("/screen_record-").append(new SimpleDateFormat("dd-MM-yyy-hh_mm_ss")
+                            .format(new Date())).append(".mp4").toString();
+
+            mMediaRecorder.setOutputFile(mVideoUrl);
+            mMediaRecorder.setVideoSize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mMediaRecorder.setVideoEncodingBitRate(cpHigh.videoBitRate);
+            mMediaRecorder.setVideoFrameRate(cpHigh.videoFrameRate);
+
+
+            int rotation = getWindowManager().getDefaultDisplay().getRotation();
+            int orientation = ORIENTATIONS.get(rotation + 90);
+
+            mMediaRecorder.setOrientationHint(orientation);
+            mMediaRecorder.prepare();
+
+        } catch (IOException e) {
+            Toast.makeText(this, "Exception: " + e, LENGTH_LONG).show();
         }
     }
 
