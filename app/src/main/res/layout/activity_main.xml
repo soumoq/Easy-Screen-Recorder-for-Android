@@ -8,25 +8,41 @@
     tools:context=".MainActivity">
 
 
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/radioGroup"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="-21dp"
+        android:text="select screen recording quality" />
+
     <RadioGroup
         android:id="@+id/radioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         android:orientation="vertical">
 
         <RadioButton
             android:id="@+id/radioButton1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Radio Button 1 "
+            android:text="High quality"
             android:textSize="18sp"/>
 
+        <RadioButton
+            android:id="@+id/radioButton2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Medium quality"
+            android:textSize="18sp"/>
         <RadioButton
             android:id="@+id/radioButton3"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Radio Button 3"
+            android:text="Low quality"
             android:textSize="18sp"/>
     </RadioGroup>
 

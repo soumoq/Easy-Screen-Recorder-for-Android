@@ -35,6 +35,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -112,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
 
     private String quality;
+    private RadioGroup radioGroup;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -158,6 +161,26 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
         mMediaRecorder = new MediaRecorder();
         mMediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+        radioGroup.check(R.id.radioButton2);
+        quality="mid";
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @SuppressLint("ResourceType")
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                RadioButton rb = (RadioButton) group.findViewById(checkedId);
+                if (null != rb && checkedId > -1) {
+                    if (rb.getText().equals("High quality")) {
+                        quality="high";
+                    } else if (rb.getText().equals("Medium quality")) {
+                        quality="mid";
+                    } else if (rb.getText().equals("Low quality")) {
+                        quality="low";
+                    }
+                }
+            }
+        });
 
     }
 
@@ -187,15 +210,14 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         if (toggleButton.isChecked()) {
             Toast.makeText(this, "Recording start", LENGTH_LONG).show();
 
-            quality="mid";
-            if(quality.equals("high"))
+            if (quality.equals("high"))
                 initRecorderHighResolution();
-            else if(quality.equals("low"))
+            else if (quality.equals("low"))
                 initRecorderLowResolution();
-            else if(quality.equals("mid"))
+            else if (quality.equals("mid"))
                 initRecorderMidResolution();
 
-           reocrdScreen();
+            reocrdScreen();
         } else {
             mMediaRecorder.stop();
             mMediaRecorder.reset();
@@ -227,6 +249,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
     private void initRecorderHighResolution() {
         try {
+            Toast.makeText(this,"Recoding quality high",LENGTH_LONG).show();
 
             DisplayMetrics metrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -268,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
     private void initRecorderLowResolution() {
         try {
+            Toast.makeText(this,"Recoding quality low",LENGTH_LONG).show();
 
             DisplayMetrics metrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -307,8 +331,10 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     }
 
 
-    private void initRecorderMidResolution(){
+    private void initRecorderMidResolution() {
         try {
+            Toast.makeText(this,"Recoding quality medium",LENGTH_LONG).show();
+
 
             DisplayMetrics metrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(metrics);
