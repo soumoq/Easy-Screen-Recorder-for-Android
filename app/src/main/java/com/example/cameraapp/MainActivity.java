@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     private RadioGroup radioGroup;
     private ToggleButton toggleButton;
     private ImageView closeBtn;
+    private boolean cameraState = true;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -515,7 +516,11 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         //bind to lifecycle:
         CameraXLifeCycle lifeCycle = new CameraXLifeCycle();
         lifeCycle.doOnResume();
-        CameraX.bindToLifecycle(lifeCycle, preview);
+
+        if (cameraState)
+            CameraX.bindToLifecycle(lifeCycle, preview);
+        else
+            CameraX.unbind(preview);
 
     }
 
@@ -647,6 +652,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
 
         ToggleButton switchCamera = view.findViewById(R.id.switchCamera);
+        ToggleButton cameraOnOff = view.findViewById(R.id.cameraOnOff);
 
         startCamera(textureView123, CameraX.LensFacing.FRONT);
         switchCamera.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -660,6 +666,24 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             }
         });
 
+        cameraOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    switchCamera.setVisibility(View.INVISIBLE);
+                    cameraState=false;
+                    startCamera(textureView123,CameraX.LensFacing.FRONT);
+                    textureView123.setVisibility(View.INVISIBLE);
+
+                } else {
+                    textureView123.setVisibility(View.VISIBLE);
+                    switchCamera.setVisibility(View.VISIBLE);
+                    cameraState=true;
+                    startCamera(textureView123,CameraX.LensFacing.FRONT);
+                }
+            }
+        });
+
 
     }
 
@@ -667,6 +691,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     public void onCloseListener() {
         Toast.makeText(this, "Close webcam", Toast.LENGTH_SHORT).show();
     }
+
 
 }
 

@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_layout"
-    android:layout_width="80dp"
+    android:layout_width="105dp"
     android:layout_height="170dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/root_container"
-        android:layout_width="80dp"
+        android:layout_width="105dp"
         android:layout_height="140dp"
         app:cardElevation="0dp"
         app:cardUseCompatPadding="true">
@@ -47,8 +47,8 @@
 
             <ToggleButton
                 android:id="@+id/switchCamera"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_alignParentRight="true"
                 android:background="@drawable/ic_baseline_rotate_left_24"
                 android:textOff=""
@@ -61,7 +61,7 @@
     </androidx.cardview.widget.CardView>
 
     <RelativeLayout
-        android:layout_width="80dp"
+        android:layout_width="105dp"
         android:layout_height="170dp">
 
         <ToggleButton
@@ -74,13 +74,24 @@
             android:textOff=""
             android:textOn="" />
 
+        <ToggleButton
+            android:id="@+id/cameraOnOff"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_toRightOf="@+id/open_button"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/camera_off_on"
+            android:textOff=""
+            android:textOn="" />
+
         <ImageView
             android:id="@+id/open_button"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
-            android:src="@drawable/ic_baseline_fullscreen_24"
+            android:src="@drawable/ic_baseline_unfold_more_24"
             tools:ignore="NotSibling" />
 
     </RelativeLayout>
