@@ -117,7 +117,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
     private String quality;
     private RadioGroup radioGroup;
-
+    private ToggleButton toggleButton;
+    private ImageView closeBtn;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -208,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void toggleScreenShare(View v) {
-        ToggleButton toggleButton = (ToggleButton) v;
+        toggleButton = (ToggleButton) v;
         if (toggleButton.isChecked()) {
             Toast.makeText(this, "Recording start", LENGTH_LONG).show();
 
@@ -219,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             else if (quality.equals("mid"))
                 initRecorderMidResolution();
 
+            closeBtn.setVisibility(View.INVISIBLE);
             reocrdScreen();
         } else {
             mMediaRecorder.stop();
@@ -441,6 +443,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
         mVirtualDisplay.release();
         destroyMediaProjection();
+        closeBtn.setVisibility(View.VISIBLE);
         Toast.makeText(this, "Recording stop", LENGTH_LONG).show();
     }
 
@@ -494,7 +497,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(face).build();
         Preview preview = new Preview(pConfig);
 
-
         preview.setOnPreviewOutputUpdateListener(
                 new Preview.OnPreviewOutputUpdateListener() {
                     //to update the surface texture we  have to destroy it first then re-add it
@@ -503,7 +505,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
                         ViewGroup parent = (ViewGroup) textureView.getParent();
                         parent.removeView(textureView);
                         parent.addView(textureView, 0);
-
 
                         textureView.setSurfaceTexture(output.getSurfaceTexture());
                         updateTransform(textureView);
@@ -582,7 +583,9 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         Toast.makeText(this, "Open webcam", Toast.LENGTH_SHORT).show();
 
         CardView cardView = (CardView) view.findViewById(R.id.root_container);
-        cardView.setCardElevation(0);
+        cardView.setCardElevation(1);
+
+
         mToggleButton = view.findViewById(R.id.toggleButton1);
         mToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -621,7 +624,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         });
 
 
-        ImageView closeBtn = view.findViewById(R.id.btn_close);
+        closeBtn = view.findViewById(R.id.btn_close);
         closeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -649,18 +652,13 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         switchCamera.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked)
-                {
+                if (isChecked) {
                     startCamera(textureView123, CameraX.LensFacing.BACK);
-                }
-                else
-                {
+                } else {
                     startCamera(textureView123, CameraX.LensFacing.FRONT);
                 }
             }
         });
-
-
 
 
     }
