@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Rational;
@@ -33,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -483,20 +485,15 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
 
     @SuppressLint("RestrictedApi")
-    private void startCamera(TextureView textureView) {
+    private void startCamera(TextureView textureView, CameraX.LensFacing face) {
 
         CameraX.unbindAll();
         Rational aspectRatio = new Rational(textureView.getWidth(), textureView.getHeight());
         Size screen = new Size(textureView.getWidth(), textureView.getHeight()); //size of the screen
 
-        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(CameraX.LensFacing.FRONT).build();
+        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(face).build();
         Preview preview = new Preview(pConfig);
 
-        try {
-            CameraX.getCameraWithLensFacing(CameraX.LensFacing.FRONT);
-        } catch (Exception e) {
-            Toast.makeText(this, "Exception: " + e, LENGTH_LONG).show();
-        }
 
         preview.setOnPreviewOutputUpdateListener(
                 new Preview.OnPreviewOutputUpdateListener() {
@@ -645,10 +642,26 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
         TextureView textureView123 = (TextureView) view.findViewById(R.id.view_finder123);
 
-        if (allPermissionsGranted()) {
-            startCamera(textureView123);
 
-        }
+        ToggleButton switchCamera = view.findViewById(R.id.switchCamera);
+
+        startCamera(textureView123, CameraX.LensFacing.FRONT);
+        switchCamera.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked)
+                {
+                    startCamera(textureView123, CameraX.LensFacing.BACK);
+                }
+                else
+                {
+                    startCamera(textureView123, CameraX.LensFacing.FRONT);
+                }
+            }
+        });
+
+
+
 
     }
 
