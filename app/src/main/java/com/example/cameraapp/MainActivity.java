@@ -350,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             //mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
 
 
-            CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_480P);
+            CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_QVGA);
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -360,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
                             .format(new Date())).append(".mp4").toString();
 
             mMediaRecorder.setOutputFile(mVideoUrl);
-            mMediaRecorder.setVideoSize(720, 480);
+            mMediaRecorder.setVideoSize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
             mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
             mMediaRecorder.setVideoEncodingBitRate(cpHigh.videoBitRate);
