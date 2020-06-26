@@ -9,7 +9,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/root_container"
         android:layout_width="105dp"
-        android:layout_height="140dp"
+        android:layout_height="170dp"
         app:cardElevation="0dp"
         app:cardUseCompatPadding="true">
 
@@ -24,7 +24,7 @@
             <TextureView
                 android:id="@+id/view_finder123"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="130dp"
                 android:layout_alignParentTop="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -53,47 +53,50 @@
                 android:background="@drawable/ic_baseline_rotate_left_24"
                 android:textOff=""
                 android:textOn=""
+                />
+
+            <ToggleButton
+                android:id="@+id/toggleButton1"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/toggle_selector"
+                android:textOff=""
+                android:textOn="" />
+
+            <ToggleButton
+                android:id="@+id/cameraOnOff"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginRight="10dp"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/camera_off_on"
+                android:textOff=""
+                android:textOn="" />
+
+            <ImageView
+                android:id="@+id/open_button"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:visibility="gone"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/ic_baseline_unfold_more_24"
+                tools:ignore="NotSibling" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:id="@+id/textMove"
+                android:layout_height="wrap_content"
+                android:text="tap to \nmove"
+                android:textSize="8dp"
+                android:alpha="0.7"
                 android:layout_alignParentBottom="true"
                 />
 
-
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
-
-    <RelativeLayout
-        android:layout_width="105dp"
-        android:layout_height="170dp">
-
-        <ToggleButton
-            android:id="@+id/toggleButton1"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/toggle_selector"
-            android:textOff=""
-            android:textOn="" />
-
-        <ToggleButton
-            android:id="@+id/cameraOnOff"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_toRightOf="@+id/open_button"
-            android:layout_marginRight="10dp"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/camera_off_on"
-            android:textOff=""
-            android:textOn="" />
-
-        <ImageView
-            android:id="@+id/open_button"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:src="@drawable/ic_baseline_unfold_more_24"
-            tools:ignore="NotSibling" />
-
-    </RelativeLayout>
 
 </FrameLayout>

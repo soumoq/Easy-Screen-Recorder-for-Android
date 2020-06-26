@@ -37,6 +37,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -120,6 +121,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     private ToggleButton toggleButton;
     private ImageView closeBtn;
     private boolean cameraState = true;
+    private TextView textMove;
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -133,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         button = (Button) findViewById(R.id.btn_run);
         switchActivity = (Button) findViewById(R.id.switchActivity);
         mRootLayout = findViewById(R.id.rootLayout);
+
 
 
         floatingLayout = new FloatingLayout(getApplicationContext(), R.layout.floting_layout, MainActivity.this);
@@ -336,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     }
 
 
+    @SuppressLint("SimpleDateFormat")
     private void initRecorderMidResolution() {
         try {
             Toast.makeText(this, "Recoding quality medium", LENGTH_LONG).show();
@@ -587,6 +592,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     public void onCreateListener(@Nullable View view) {
         Toast.makeText(this, "Open webcam", Toast.LENGTH_SHORT).show();
 
+
         CardView cardView = (CardView) view.findViewById(R.id.root_container);
         cardView.setCardElevation(1);
 
@@ -649,7 +655,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         });
 
         TextureView textureView123 = (TextureView) view.findViewById(R.id.view_finder123);
-
+        textMove=view.findViewById(R.id.textMove);
+        textMove.setVisibility(View.INVISIBLE);
 
         ToggleButton switchCamera = view.findViewById(R.id.switchCamera);
         ToggleButton cameraOnOff = view.findViewById(R.id.cameraOnOff);
@@ -674,12 +681,19 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
                     cameraState=false;
                     startCamera(textureView123,CameraX.LensFacing.FRONT);
                     textureView123.setVisibility(View.INVISIBLE);
+                    cardView.setLayoutParams(new CardView.LayoutParams(270,180));
+                    textMove.setVisibility(View.VISIBLE);
+
 
                 } else {
                     textureView123.setVisibility(View.VISIBLE);
                     switchCamera.setVisibility(View.VISIBLE);
                     cameraState=true;
+                    cardView.setLayoutParams(new CardView.LayoutParams(300,520));
                     startCamera(textureView123,CameraX.LensFacing.FRONT);
+                    textMove.setVisibility(View.INVISIBLE);
+
+
                 }
             }
         });
