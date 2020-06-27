@@ -22,6 +22,7 @@ import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Rational;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -60,6 +61,9 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -123,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     private boolean cameraState = true;
     private TextView textMove;
 
+    private static final String TAG = "CameraApp";
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -136,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         button = (Button) findViewById(R.id.btn_run);
         switchActivity = (Button) findViewById(R.id.switchActivity);
         mRootLayout = findViewById(R.id.rootLayout);
-
 
 
         floatingLayout = new FloatingLayout(getApplicationContext(), R.layout.floting_layout, MainActivity.this);
@@ -400,6 +405,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         if (resultCode != RESULT_OK) {
             Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
             mToggleButton.setChecked(false);
+            mMediaRecorder.reset();
+            closeBtn.setVisibility(View.VISIBLE);
             return;
         }
 
@@ -496,36 +503,41 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     @SuppressLint("RestrictedApi")
     private void startCamera(TextureView textureView, CameraX.LensFacing face) {
 
-        CameraX.unbindAll();
-        Rational aspectRatio = new Rational(textureView.getWidth(), textureView.getHeight());
-        Size screen = new Size(textureView.getWidth(), textureView.getHeight()); //size of the screen
+       try {
+           CameraX.unbindAll();
+           Rational aspectRatio = new Rational(textureView.getWidth(), textureView.getHeight());
+           Size screen = new Size(textureView.getWidth(), textureView.getHeight()); //size of the screen
 
-        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(face).build();
-        Preview preview = new Preview(pConfig);
+           PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(face).build();
+           Preview preview = new Preview(pConfig);
 
-        preview.setOnPreviewOutputUpdateListener(
-                new Preview.OnPreviewOutputUpdateListener() {
-                    //to update the surface texture we  have to destroy it first then re-add it
-                    @Override
-                    public void onUpdated(Preview.PreviewOutput output) {
-                        ViewGroup parent = (ViewGroup) textureView.getParent();
-                        parent.removeView(textureView);
-                        parent.addView(textureView, 0);
+           preview.setOnPreviewOutputUpdateListener(
+                   new Preview.OnPreviewOutputUpdateListener() {
+                       //to update the surface texture we  have to destroy it first then re-add it
+                       @Override
+                       public void onUpdated(Preview.PreviewOutput output) {
+                           ViewGroup parent = (ViewGroup) textureView.getParent();
+                           parent.removeView(textureView);
+                           parent.addView(textureView, 0);
 
-                        textureView.setSurfaceTexture(output.getSurfaceTexture());
-                        updateTransform(textureView);
-                    }
-                });
+                           textureView.setSurfaceTexture(output.getSurfaceTexture());
+                           updateTransform(textureView);
+                       }
+                   });
 
 
-        //bind to lifecycle:
-        CameraXLifeCycle lifeCycle = new CameraXLifeCycle();
-        lifeCycle.doOnResume();
+           //bind to lifecycle:
+           CameraXLifeCycle lifeCycle = new CameraXLifeCycle();
+           lifeCycle.doOnResume();
 
-        if (cameraState)
-            CameraX.bindToLifecycle(lifeCycle, preview);
-        else
-            CameraX.unbind(preview);
+           if (cameraState)
+               CameraX.bindToLifecycle(lifeCycle, preview);
+           else
+               CameraX.unbind(preview);
+       }catch (Exception e)
+       {
+           appendLog("Exception: "+e);
+       }
 
     }
 
@@ -579,6 +591,37 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         }
 
         return true;
+    }
+
+
+    public void appendLog(String text)
+    {
+        File logFile = new File("sdcard/log.txt");
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(text);
+            buf.newLine();
+            buf.close();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 
@@ -655,7 +698,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         });
 
         TextureView textureView123 = (TextureView) view.findViewById(R.id.view_finder123);
-        textMove=view.findViewById(R.id.textMove);
+        textMove = view.findViewById(R.id.textMove);
         textMove.setVisibility(View.INVISIBLE);
 
         ToggleButton switchCamera = view.findViewById(R.id.switchCamera);
@@ -678,19 +721,19 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     switchCamera.setVisibility(View.INVISIBLE);
-                    cameraState=false;
-                    startCamera(textureView123,CameraX.LensFacing.FRONT);
+                    cameraState = false;
+                    startCamera(textureView123, CameraX.LensFacing.FRONT);
                     textureView123.setVisibility(View.INVISIBLE);
-                    cardView.setLayoutParams(new CardView.LayoutParams(270,180));
+                    cardView.setLayoutParams(new CardView.LayoutParams(270, 180));
                     textMove.setVisibility(View.VISIBLE);
 
 
                 } else {
                     textureView123.setVisibility(View.VISIBLE);
                     switchCamera.setVisibility(View.VISIBLE);
-                    cameraState=true;
-                    cardView.setLayoutParams(new CardView.LayoutParams(300,520));
-                    startCamera(textureView123,CameraX.LensFacing.FRONT);
+                    cameraState = true;
+                    cardView.setLayoutParams(new CardView.LayoutParams(300, 520));
+                    startCamera(textureView123, CameraX.LensFacing.FRONT);
                     textMove.setVisibility(View.INVISIBLE);
 
 
