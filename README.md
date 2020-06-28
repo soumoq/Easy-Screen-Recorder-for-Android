@@ -3,4 +3,9 @@ CameraX is an addition to Android Jetpack that makes it easier to add camera cap
 In this app you can switch camera very frequently. \
 You can abel to capture image and store internal storage. (Check commit message) \
 
-![Image](cameraX.png)
+![Image](set.png)
+![Image](back.png)
+![Image](front.png)
+![Image](background.png)
+
+
