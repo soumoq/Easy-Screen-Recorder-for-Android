@@ -6,9 +6,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Matrix;
-import android.hardware.Camera;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.CamcorderProfile;
@@ -19,26 +17,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.Rational;
 import android.util.Size;
 import android.util.SparseIntArray;
-import android.view.MotionEvent;
 import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -55,7 +45,6 @@ import androidx.camera.core.PreviewConfig;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LifecycleOwner;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -66,7 +55,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -111,14 +99,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
 
     private static final int MY_PERMISSIONS_CAMERA = 1;
-    private static final int CODE_DRAW_OVER_OTHER_APP_PERMISSION = 2084;
-    private int REQUEST_CODE_PERMISSIONS = 101;
-    private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
-    //private TextureView textureView;
     private FloatingLayout floatingLayout;
     private Button button, switchActivity;
-
-    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
 
     private String quality;
     private RadioGroup radioGroup;
@@ -126,8 +108,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     private ImageView closeBtn;
     private boolean cameraState = true;
     private TextView textMove;
-
-    private static final String TAG = "CameraApp";
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -139,30 +119,30 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         grantPermission();
         grantAllPermission();
 
-        button = (Button) findViewById(R.id.btn_run);
-        switchActivity = (Button) findViewById(R.id.switchActivity);
+        button = (Button) findViewById(R.id.btn_run);   //open webcam button
         mRootLayout = findViewById(R.id.rootLayout);
 
 
+        //Create Floating layout
         floatingLayout = new FloatingLayout(getApplicationContext(), R.layout.floting_layout, MainActivity.this);
+
+
+        //Open webcam button
         button.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ShowToast")
             @Override
             public void onClick(View v) {
-                //btn_run.setOnClickListener { if (!floatingLayout!!.isShow()) floatingLayout!!.create() }
-                if (!floatingLayout.isShow()) {
-                    floatingLayout.create();
-                } else {
-                    Toast.makeText(MainActivity.this, "Already Running", LENGTH_LONG).show();
+
+                if(grantAllPermission()) {
+                    if (!floatingLayout.isShow()) {
+                        floatingLayout.create();        //creating floating layout
+                    } else {
+                        Toast.makeText(MainActivity.this, "Already Running", LENGTH_LONG).show();
+                    }
                 }
-            }
-        });
-
-        switchActivity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent intent = new Intent(MainActivity.this, Test.class);
-                startActivity(intent);
+                else {
+                    Toast.makeText(MainActivity.this, "Please grant all permission", LENGTH_LONG).show();
+                }
             }
         });
 
@@ -175,8 +155,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         mMediaRecorder = new MediaRecorder();
         mMediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
-        radioGroup.check(R.id.radioButton2);
-        quality = "mid";
+        radioGroup.check(R.id.radioButton1);
+        quality = "high";
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @SuppressLint("ResourceType")
@@ -198,21 +178,25 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void grantPermission() {
+    private boolean grantPermission() {    //Permission for draw over other app
         if (!Settings.canDrawOverlays(this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, 0);
-        }
+            return true;
+        } else
+            return false;
     }
 
     @AfterPermissionGranted(123)
-    private void grantAllPermission() {
+    private boolean grantAllPermission() {     //permission for other feature
         String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO};
         if (EasyPermissions.hasPermissions(this, perms)) {
             Toast.makeText(this, "Ready to start", LENGTH_LONG).show();
+            return true;
         } else {
-            EasyPermissions.requestPermissions(this, "to access camera",
+            EasyPermissions.requestPermissions(this, "Please grant all permission to use the app",
                     123, perms);
+            return false;
         }
     }
 
@@ -231,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
                 initRecorderMidResolution();
 
             closeBtn.setVisibility(View.INVISIBLE);
-            reocrdScreen();
+            recordScreen();
         } else {
 //            mMediaRecorder.stop();
             mMediaRecorder.reset();
@@ -244,12 +228,11 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void reocrdScreen() {
+    private void recordScreen() {
         if (mMediaProjection == null) {
             startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), REQUEST_CODE);
             return;
         }
-
         mVirtualDisplay = createVirtualDisplay();
         mMediaRecorder.start();
     }
@@ -277,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 
             mVideoUrl = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) +
                     new StringBuilder("/screen_record-").append(new SimpleDateFormat("dd-MM-yyy-hh_mm_ss")
@@ -319,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_LOW);
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 
             mVideoUrl = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) +
                     new StringBuilder("/screen_record-").append(new SimpleDateFormat("dd-MM-yyy-hh_mm_ss")
@@ -363,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_QVGA);
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 
             mVideoUrl = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) +
                     new StringBuilder("/screen_record-").append(new SimpleDateFormat("dd-MM-yyy-hh_mm_ss")
@@ -503,41 +486,40 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     @SuppressLint("RestrictedApi")
     private void startCamera(TextureView textureView, CameraX.LensFacing face) {
 
-       try {
-           CameraX.unbindAll();
-           Rational aspectRatio = new Rational(textureView.getWidth(), textureView.getHeight());
-           Size screen = new Size(textureView.getWidth(), textureView.getHeight()); //size of the screen
+        try {
+            CameraX.unbindAll();
+            Rational aspectRatio = new Rational(textureView.getWidth(), textureView.getHeight());
+            Size screen = new Size(textureView.getWidth(), textureView.getHeight()); //size of the screen
 
-           PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(face).build();
-           Preview preview = new Preview(pConfig);
+            PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(face).build();
+            Preview preview = new Preview(pConfig);
 
-           preview.setOnPreviewOutputUpdateListener(
-                   new Preview.OnPreviewOutputUpdateListener() {
-                       //to update the surface texture we  have to destroy it first then re-add it
-                       @Override
-                       public void onUpdated(Preview.PreviewOutput output) {
-                           ViewGroup parent = (ViewGroup) textureView.getParent();
-                           parent.removeView(textureView);
-                           parent.addView(textureView, 0);
+            preview.setOnPreviewOutputUpdateListener(
+                    new Preview.OnPreviewOutputUpdateListener() {
+                        //to update the surface texture we  have to destroy it first then re-add it
+                        @Override
+                        public void onUpdated(Preview.PreviewOutput output) {
+                            ViewGroup parent = (ViewGroup) textureView.getParent();
+                            parent.removeView(textureView);
+                            parent.addView(textureView, 0);
 
-                           textureView.setSurfaceTexture(output.getSurfaceTexture());
-                           updateTransform(textureView);
-                       }
-                   });
+                            textureView.setSurfaceTexture(output.getSurfaceTexture());
+                            updateTransform(textureView);
+                        }
+                    });
 
 
-           //bind to lifecycle:
-           CameraXLifeCycle lifeCycle = new CameraXLifeCycle();
-           lifeCycle.doOnResume();
+            //bind to lifecycle:
+            CameraXLifeCycle lifeCycle = new CameraXLifeCycle();
+            lifeCycle.doOnResume();
 
-           if (cameraState)
-               CameraX.bindToLifecycle(lifeCycle, preview);
-           else
-               CameraX.unbind(preview);
-       }catch (Exception e)
-       {
-           appendLog("Exception: "+e);
-       }
+            if (cameraState)
+                CameraX.bindToLifecycle(lifeCycle, preview);
+            else
+                CameraX.unbind(preview);
+        } catch (Exception e) {
+            appendLog("Exception: " + e);
+        }
 
     }
 
@@ -573,52 +555,24 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         textureView.setTransform(mx);
     }
 
-    private boolean allPermissionsGranted() {
-        //When permission is not granted by user, show them message why this permission is needed.
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.CAMERA)) {
-            Toast.makeText(this, "Please grant permissions to camera", LENGTH_LONG).show();
 
-            //Give user option to still opt-in the permissions
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA},
-                    MY_PERMISSIONS_CAMERA);
-        } else {
-            // Show user dialog to grant permission to record audio
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA},
-                    MY_PERMISSIONS_CAMERA);
-        }
-
-        return true;
-    }
-
-
-    public void appendLog(String text)
-    {
+    public void appendLog(String text) {
         File logFile = new File("sdcard/log.txt");
-        if (!logFile.exists())
-        {
-            try
-            {
+        if (!logFile.exists()) {
+            try {
                 logFile.createNewFile();
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
-        try
-        {
+        try {
             //BufferedWriter for performance, true to set append to file flag
             BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
             buf.append(text);
             buf.newLine();
             buf.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -640,7 +594,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         cardView.setCardElevation(1);
 
 
-        mToggleButton = view.findViewById(R.id.toggleButton1);
+        mToggleButton = view.findViewById(R.id.toggleButton1);   //recording play pose button
         mToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -678,7 +632,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         });
 
 
-        closeBtn = view.findViewById(R.id.btn_close);
+        closeBtn = view.findViewById(R.id.btn_close);    //Close button
         closeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -686,7 +640,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             }
         });
 
-        ImageView openBtn = view.findViewById(R.id.open_button);
+        ImageView openBtn = view.findViewById(R.id.open_button);   //Jump main activity button
         openBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -697,12 +651,19 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             }
         });
 
-        TextureView textureView123 = (TextureView) view.findViewById(R.id.view_finder123);
+
+        TextureView textureView123 = (TextureView) view.findViewById(R.id.view_finder123);   //camera view
         textMove = view.findViewById(R.id.textMove);
         textMove.setVisibility(View.INVISIBLE);
 
-        ToggleButton switchCamera = view.findViewById(R.id.switchCamera);
-        ToggleButton cameraOnOff = view.findViewById(R.id.cameraOnOff);
+        ToggleButton switchCamera = view.findViewById(R.id.switchCamera);  //switch camera front back button
+        ToggleButton cameraOnOff = view.findViewById(R.id.cameraOnOff);   //camera play pose button
+
+        switchCamera.setVisibility(View.INVISIBLE);
+        cameraState = false;
+        textureView123.setVisibility(View.INVISIBLE);
+        cardView.setLayoutParams(new CardView.LayoutParams(270, 180));
+        textMove.setVisibility(View.VISIBLE);
 
         startCamera(textureView123, CameraX.LensFacing.FRONT);
         switchCamera.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -719,10 +680,9 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         cameraOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
+                if (!isChecked) {
                     switchCamera.setVisibility(View.INVISIBLE);
                     cameraState = false;
-                    startCamera(textureView123, CameraX.LensFacing.FRONT);
                     textureView123.setVisibility(View.INVISIBLE);
                     cardView.setLayoutParams(new CardView.LayoutParams(270, 180));
                     textMove.setVisibility(View.VISIBLE);
