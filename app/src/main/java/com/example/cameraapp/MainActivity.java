@@ -55,6 +55,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     private ImageView closeBtn;
     private boolean cameraState = true;
     private TextView textMove;
+    LogCheck log;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -115,6 +117,10 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Date currentTime = Calendar.getInstance().getTime();//fetch date
+        log = new LogCheck(); //  Create log object
+        log.appendLog("\n\n\n\n\n"+currentTime + "\n : Start on create \n");
 
         grantPermission();
         grantAllPermission();
@@ -133,14 +139,15 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             @Override
             public void onClick(View v) {
 
-                if(grantAllPermission()) {
+                if (grantAllPermission()) {
                     if (!floatingLayout.isShow()) {
+                        log.appendLog("creating floating layout");
                         floatingLayout.create();        //creating floating layout
                     } else {
+                        log.appendLog("Already Running floating layout");
                         Toast.makeText(MainActivity.this, "Already Running", LENGTH_LONG).show();
                     }
-                }
-                else {
+                } else {
                     Toast.makeText(MainActivity.this, "Please grant all permission", LENGTH_LONG).show();
                 }
             }
@@ -175,16 +182,20 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             }
         });
 
+        log.appendLog("End on create");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private boolean grantPermission() {    //Permission for draw over other app
         if (!Settings.canDrawOverlays(this)) {
+            log.appendLog("deny draw over other app permission");
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, 0);
             return true;
-        } else
+        } else {
+            log.appendLog("Draw over other app permission");
             return false;
+        }
     }
 
     @AfterPermissionGranted(123)
@@ -192,8 +203,10 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO};
         if (EasyPermissions.hasPermissions(this, perms)) {
             Toast.makeText(this, "Ready to start", LENGTH_LONG).show();
+            log.appendLog("Feature permission");
             return true;
         } else {
+            log.appendLog("deny feature permission");
             EasyPermissions.requestPermissions(this, "Please grant all permission to use the app",
                     123, perms);
             return false;
@@ -207,12 +220,20 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         if (toggleButton.isChecked()) {
             Toast.makeText(this, "Recording start", LENGTH_LONG).show();
 
-            if (quality.equals("high"))
+            if (quality.equals("high")) {
+                log.appendLog("Start high quality recording");
                 initRecorderHighResolution();
-            else if (quality.equals("low"))
+                log.appendLog("End high quality recording");
+
+            } else if (quality.equals("low")) {
+                log.appendLog("Start low quality recording");
                 initRecorderLowResolution();
-            else if (quality.equals("mid"))
+                log.appendLog("Start end quality recording");
+            } else if (quality.equals("mid")) {
+                log.appendLog("Start mid quality recording");
                 initRecorderMidResolution();
+                log.appendLog("Start mid quality recording");
+            }
 
             closeBtn.setVisibility(View.INVISIBLE);
             recordScreen();
@@ -282,6 +303,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
         } catch (IOException e) {
             Toast.makeText(this, "Exception: " + e, LENGTH_LONG).show();
+            log.appendLog("Exception high quality : " + e);
         }
     }
 
@@ -324,6 +346,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
         } catch (IOException e) {
             Toast.makeText(this, "Exception: " + e, LENGTH_LONG).show();
+            log.appendLog("Exception low quality : " + e);
         }
     }
 
@@ -368,6 +391,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
         } catch (IOException e) {
             Toast.makeText(this, "Exception: " + e, LENGTH_LONG).show();
+            log.appendLog("Exception mid quality : " + e);
         }
     }
 
@@ -486,44 +510,43 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     @SuppressLint("RestrictedApi")
     private void startCamera(TextureView textureView, CameraX.LensFacing face) {
 
-        try {
-            CameraX.unbindAll();
-            Rational aspectRatio = new Rational(textureView.getWidth(), textureView.getHeight());
-            Size screen = new Size(textureView.getWidth(), textureView.getHeight()); //size of the screen
+        log.appendLog("Camera is starting....");
+        CameraX.unbindAll();
+        Rational aspectRatio = new Rational(textureView.getWidth(), textureView.getHeight());
+        Size screen = new Size(textureView.getWidth(), textureView.getHeight()); //size of the screen
 
-            PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(face).build();
-            Preview preview = new Preview(pConfig);
+        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).setLensFacing(face).build();
+        Preview preview = new Preview(pConfig);
 
-            preview.setOnPreviewOutputUpdateListener(
-                    new Preview.OnPreviewOutputUpdateListener() {
-                        //to update the surface texture we  have to destroy it first then re-add it
-                        @Override
-                        public void onUpdated(Preview.PreviewOutput output) {
-                            ViewGroup parent = (ViewGroup) textureView.getParent();
-                            parent.removeView(textureView);
-                            parent.addView(textureView, 0);
+        preview.setOnPreviewOutputUpdateListener(
+                new Preview.OnPreviewOutputUpdateListener() {
+                    //to update the surface texture we  have to destroy it first then re-add it
+                    @Override
+                    public void onUpdated(Preview.PreviewOutput output) {
+                        ViewGroup parent = (ViewGroup) textureView.getParent();
+                        parent.removeView(textureView);
+                        parent.addView(textureView, 0);
 
-                            textureView.setSurfaceTexture(output.getSurfaceTexture());
-                            updateTransform(textureView);
-                        }
-                    });
+                        textureView.setSurfaceTexture(output.getSurfaceTexture());
+                        updateTransform(textureView);
+                    }
+                });
 
 
-            //bind to lifecycle:
-            CameraXLifeCycle lifeCycle = new CameraXLifeCycle();
-            lifeCycle.doOnResume();
+        //bind to lifecycle:
+        CameraXLifeCycle lifeCycle = new CameraXLifeCycle();
+        lifeCycle.doOnResume();
 
-            if (cameraState)
-                CameraX.bindToLifecycle(lifeCycle, preview);
-            else
-                CameraX.unbind(preview);
-        } catch (Exception e) {
-            appendLog("Exception: " + e);
-        }
+        if (cameraState)
+            CameraX.bindToLifecycle(lifeCycle, preview);
+        else
+            CameraX.unbind(preview);
 
     }
 
     private void updateTransform(TextureView textureView) {
+
+        log.appendLog("Camera is into updateTransform method");
         Matrix mx = new Matrix();
         float w = textureView.getMeasuredWidth();
         float h = textureView.getMeasuredHeight();
@@ -553,40 +576,19 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
         mx.postRotate((float) rotationDgr, cX, cY);
         textureView.setTransform(mx);
-    }
-
-
-    public void appendLog(String text) {
-        File logFile = new File("sdcard/log.txt");
-        if (!logFile.exists()) {
-            try {
-                logFile.createNewFile();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        try {
-            //BufferedWriter for performance, true to set append to file flag
-            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
-            buf.append(text);
-            buf.newLine();
-            buf.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        log.appendLog("Camera is out of updateTransform method");
     }
 
 
     @Override
     public void onClickListener(int resourceId) {
-
+        log.appendLog("Floating layout : onClickListener");
     }
 
     @SuppressLint({"SetTextI18n", "RestrictedApi"})
     @Override
     public void onCreateListener(@Nullable View view) {
+        log.appendLog("Floating layout : start onCreateListener");
         Toast.makeText(this, "Open webcam", Toast.LENGTH_SHORT).show();
 
 
@@ -599,6 +601,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             @Override
             public void onClick(View v) {
 
+                log.appendLog("Floating layout : mToggleButton to start recording");
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) +
                         ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO)
                         != PackageManager.PERMISSION_GRANTED) {
@@ -626,6 +629,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
                                 REQUEST_PERMISSION);
                     }
                 } else {
+                    log.appendLog("Floating layout : mToggleButton to start toggleScreenShare() method");
                     toggleScreenShare(v);
                 }
             }
@@ -636,6 +640,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         closeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                log.appendLog("Close Floating layout");
                 floatingLayout.close();
             }
         });
@@ -665,14 +670,20 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         cardView.setLayoutParams(new CardView.LayoutParams(270, 180));
         textMove.setVisibility(View.VISIBLE);
 
+        log.appendLog("Start cameraX front");
         startCamera(textureView123, CameraX.LensFacing.FRONT);
+        log.appendLog("end cameraX front");
         switchCamera.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    log.appendLog("Start cameraX Back");
                     startCamera(textureView123, CameraX.LensFacing.BACK);
+                    log.appendLog("End cameraX Back");
                 } else {
+                    log.appendLog("Start cameraX Front");
                     startCamera(textureView123, CameraX.LensFacing.FRONT);
+                    log.appendLog("End CameraX Front");
                 }
             }
         });
@@ -681,14 +692,15 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (!isChecked) {
+                    log.appendLog("Camera is invisible");
                     switchCamera.setVisibility(View.INVISIBLE);
                     cameraState = false;
                     textureView123.setVisibility(View.INVISIBLE);
                     cardView.setLayoutParams(new CardView.LayoutParams(270, 180));
                     textMove.setVisibility(View.VISIBLE);
 
-
                 } else {
+                    log.appendLog("Camera is visible");
                     textureView123.setVisibility(View.VISIBLE);
                     switchCamera.setVisibility(View.VISIBLE);
                     cameraState = true;
@@ -707,6 +719,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
     @Override
     public void onCloseListener() {
         Toast.makeText(this, "Close webcam", Toast.LENGTH_SHORT).show();
+        log.appendLog("Close floating layout");
     }
 
 
