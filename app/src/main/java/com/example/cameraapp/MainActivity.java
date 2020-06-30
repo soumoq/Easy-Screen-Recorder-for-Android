@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Matrix;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
@@ -22,6 +23,7 @@ import android.util.DisplayMetrics;
 import android.util.Rational;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.util.TypedValue;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -120,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
 
         Date currentTime = Calendar.getInstance().getTime();//fetch date
         log = new LogCheck(); //  Create log object
-        log.appendLog("\n\n\n\n\n"+currentTime + "\n : Start on create \n");
+        log.appendLog("\n\n\n\n\n" + currentTime + "\n : Start on create \n");
 
         grantPermission();
         grantAllPermission();
@@ -667,7 +669,11 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
         switchCamera.setVisibility(View.INVISIBLE);
         cameraState = false;
         textureView123.setVisibility(View.INVISIBLE);
-        cardView.setLayoutParams(new CardView.LayoutParams(270, 180));
+
+        Resources r = getResources();
+        int pxw = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 90, r.getDisplayMetrics());
+        int pxh = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 64, r.getDisplayMetrics());
+        cardView.setLayoutParams(new CardView.LayoutParams(pxw, pxh));
         textMove.setVisibility(View.VISIBLE);
 
         log.appendLog("Start cameraX front");
@@ -696,7 +702,10 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
                     switchCamera.setVisibility(View.INVISIBLE);
                     cameraState = false;
                     textureView123.setVisibility(View.INVISIBLE);
-                    cardView.setLayoutParams(new CardView.LayoutParams(270, 180));
+                    Resources r = getResources();
+                    int pxw = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 90, r.getDisplayMetrics());
+                    int pxh = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 64, r.getDisplayMetrics());
+                    cardView.setLayoutParams(new CardView.LayoutParams(pxw, pxh));
                     textMove.setVisibility(View.VISIBLE);
 
                 } else {
@@ -704,8 +713,12 @@ public class MainActivity extends AppCompatActivity implements CallBack, EasyPer
                     textureView123.setVisibility(View.VISIBLE);
                     switchCamera.setVisibility(View.VISIBLE);
                     cameraState = true;
-                    cardView.setLayoutParams(new CardView.LayoutParams(300, 520));
                     startCamera(textureView123, CameraX.LensFacing.FRONT);
+
+                    Resources r = getResources();
+                    int pxw = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 105, r.getDisplayMetrics());
+                    int pxh = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 170, r.getDisplayMetrics());
+                    cardView.setLayoutParams(new CardView.LayoutParams(pxw, pxh));
                     textMove.setVisibility(View.INVISIBLE);
 
 
